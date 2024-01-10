@@ -9,7 +9,7 @@ type OrderRepositoryInterface interface {
 	UpdateStatus(order *domain.Order) error
 }
 
-type OrderServiceInterface interface {
+type OrderUseCaseInterface interface {
 	List() ([]domain.Order, error)
 	Insert(order *domain.Order) error
 	UpdateStatus(id int64, newStatus domain.Status) error

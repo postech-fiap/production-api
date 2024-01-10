@@ -7,7 +7,7 @@ import (
 	"github.com/postech-fiap/production-api/internal/adapter/handler/http"
 	"github.com/postech-fiap/production-api/internal/adapter/handler/http/middlewares"
 	"github.com/postech-fiap/production-api/internal/adapter/repository"
-	"github.com/postech-fiap/production-api/internal/core/service"
+	"github.com/postech-fiap/production-api/internal/core/usecase"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	}
 
-	// repositories
+	// repository
 	mongoClient, err := repositoryAdapter.OpenConnection(configuration)
 	if err != nil {
 		panic(err)
@@ -26,16 +26,16 @@ func main() {
 
 	mongoRepository := repository.NewMongoRepository(mongoClient)
 
-	// service
-	orderService := service.NewOrderService(mongoRepository)
+	// usecase
+	orderUseCase := usecase.NewOrderUserCase(mongoRepository)
 
-	// handler
-	orderHandler := http.NewOrderHandler(orderService)
+	// service
+	orderService := http.NewOrderService(orderUseCase)
 
 	router := gin.New()
-	router.Use(middlewares.ErrorHandler)
-	router.GET("/order", orderHandler.List)
-	router.POST("/order", orderHandler.Insert)
-	router.PUT("/order/:id/status", orderHandler.SetStatus)
+	router.Use(middlewares.ErrorService)
+	router.GET("/order", orderService.List)
+	router.POST("/order", orderService.Insert)
+	router.PUT("/order/:id/status", orderService.SetStatus)
 	router.Run()
 }

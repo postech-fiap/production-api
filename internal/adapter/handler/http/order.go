@@ -9,18 +9,18 @@ import (
 	"net/http"
 )
 
-type orderHandler struct {
-	orderService port.OrderServiceInterface
+type orderService struct {
+	orderUseCase port.OrderUseCaseInterface
 }
 
-func NewOrderHandler(orderService port.OrderServiceInterface) *orderHandler {
-	return &orderHandler{
-		orderService: orderService,
+func NewOrderService(orderUseCase port.OrderUseCaseInterface) *orderService {
+	return &orderService{
+		orderUseCase: orderUseCase,
 	}
 }
 
-func (o *orderHandler) List(c *gin.Context) {
-	orders, err := o.orderService.List()
+func (o *orderService) List(c *gin.Context) {
+	orders, err := o.orderUseCase.List()
 	if err != nil {
 		c.Error(exception.NewInvalidDataException("invalid body", err))
 		return
@@ -28,7 +28,7 @@ func (o *orderHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, orders)
 }
 
-func (o *orderHandler) Insert(c *gin.Context) {
+func (o *orderService) Insert(c *gin.Context) {
 	var requestBody dto.OrderInsertRequest
 	err := c.ShouldBind(&requestBody)
 	if err != nil {
@@ -38,7 +38,7 @@ func (o *orderHandler) Insert(c *gin.Context) {
 
 	newOrder := o.mapInsertDTOToDomain(&requestBody)
 
-	err = o.orderService.Insert(newOrder)
+	err = o.orderUseCase.Insert(newOrder)
 	if err != nil {
 		c.Error(err)
 		return
@@ -47,7 +47,7 @@ func (o *orderHandler) Insert(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
-func (o *orderHandler) SetStatus(c *gin.Context) {
+func (o *orderService) SetStatus(c *gin.Context) {
 	var requestURIParams dto.UpdateStatusRequestURI
 	err := c.ShouldBindUri(&requestURIParams)
 	if err != nil {
@@ -63,7 +63,7 @@ func (o *orderHandler) SetStatus(c *gin.Context) {
 	}
 
 	statusToSet := domain.Status(requestBody.Status)
-	err = o.orderService.UpdateStatus(requestURIParams.ID, statusToSet)
+	err = o.orderUseCase.UpdateStatus(requestURIParams.ID, statusToSet)
 	if err != nil {
 		c.Error(err)
 		return
@@ -72,7 +72,7 @@ func (o *orderHandler) SetStatus(c *gin.Context) {
 	c.Status(http.StatusAccepted)
 }
 
-func (o *orderHandler) mapInsertDTOToDomain(orderDTO *dto.OrderInsertRequest) *domain.Order {
+func (o *orderService) mapInsertDTOToDomain(orderDTO *dto.OrderInsertRequest) *domain.Order {
 	items := make([]domain.Item, 0)
 	for _, itemDTO := range orderDTO.Items {
 		item := domain.Item{

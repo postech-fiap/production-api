@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"github.com/postech-fiap/production-api/internal/core/domain"
@@ -6,17 +6,17 @@ import (
 	"github.com/postech-fiap/production-api/internal/core/port"
 )
 
-type orderService struct {
+type orderUseCase struct {
 	orderRepository port.OrderRepositoryInterface
 }
 
-func NewOrderService(orderRepository port.OrderRepositoryInterface) port.OrderServiceInterface {
-	return &orderService{
+func NewOrderUserCase(orderRepository port.OrderRepositoryInterface) port.OrderUseCaseInterface {
+	return &orderUseCase{
 		orderRepository: orderRepository,
 	}
 }
 
-func (o *orderService) List() ([]domain.Order, error) {
+func (o *orderUseCase) List() ([]domain.Order, error) {
 	orders, err := o.orderRepository.List()
 	if err != nil {
 		return nil, exception.NewFailedDependencyException(err)
@@ -24,7 +24,7 @@ func (o *orderService) List() ([]domain.Order, error) {
 	return orders, nil
 }
 
-func (o *orderService) Insert(order *domain.Order) error {
+func (o *orderUseCase) Insert(order *domain.Order) error {
 	existentOrder, err := o.get(order.ID)
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (o *orderService) Insert(order *domain.Order) error {
 	return nil
 }
 
-func (o *orderService) UpdateStatus(id int64, newStatus domain.Status) error {
+func (o *orderUseCase) UpdateStatus(id int64, newStatus domain.Status) error {
 	order, err := o.get(id)
 	if err != nil {
 		return err
@@ -64,7 +64,7 @@ func (o *orderService) UpdateStatus(id int64, newStatus domain.Status) error {
 	return nil
 }
 
-func (o *orderService) get(id int64) (*domain.Order, error) {
+func (o *orderUseCase) get(id int64) (*domain.Order, error) {
 	order, err := o.orderRepository.Get(id)
 	if err != nil {
 		return nil, exception.NewFailedDependencyException(err)

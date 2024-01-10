@@ -13,7 +13,7 @@ type customExceptionResponse struct {
 	Message    string `json:"message,omitempty"`
 }
 
-func ErrorHandler(c *gin.Context) {
+func ErrorService(c *gin.Context) {
 	c.Next()
 
 	if len(c.Errors) == 0 {
