@@ -3,6 +3,7 @@ package http
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/postech-fiap/production-api/internal/adapter/handler/http/dto"
+	"github.com/postech-fiap/production-api/internal/adapter/handler/http/mapper"
 	"github.com/postech-fiap/production-api/internal/core/domain"
 	"github.com/postech-fiap/production-api/internal/core/exception"
 	"github.com/postech-fiap/production-api/internal/core/port"
@@ -25,7 +26,8 @@ func (o *orderService) List(c *gin.Context) {
 		c.Error(exception.NewInvalidDataException("invalid body", err))
 		return
 	}
-	c.JSON(http.StatusOK, orders)
+	ordersResponse := mapper.MapDomainToOrderWrapperDto(orders)
+	c.JSON(http.StatusOK, ordersResponse)
 }
 
 func (o *orderService) Insert(c *gin.Context) {
@@ -36,7 +38,7 @@ func (o *orderService) Insert(c *gin.Context) {
 		return
 	}
 
-	newOrder := o.mapInsertDTOToDomain(&requestBody)
+	newOrder := mapper.MapInsertDTOToDomain(&requestBody)
 
 	err = o.orderUseCase.Insert(newOrder)
 	if err != nil {
@@ -51,7 +53,7 @@ func (o *orderService) SetStatus(c *gin.Context) {
 	var requestURIParams dto.UpdateStatusRequestURI
 	err := c.ShouldBindUri(&requestURIParams)
 	if err != nil {
-		c.Error(exception.NewInvalidDataException("invalid id param", err))
+		c.Error(exception.NewInvalidDataException("invalid param id", err))
 		return
 	}
 
@@ -70,23 +72,4 @@ func (o *orderService) SetStatus(c *gin.Context) {
 	}
 
 	c.Status(http.StatusAccepted)
-}
-
-func (o *orderService) mapInsertDTOToDomain(orderDTO *dto.OrderInsertRequest) *domain.Order {
-	items := make([]domain.Item, 0)
-	for _, itemDTO := range orderDTO.Items {
-		item := domain.Item{
-			Name:     itemDTO.Name,
-			Quantity: itemDTO.Quantity,
-			Comment:  itemDTO.Comment,
-		}
-		items = append(items, item)
-	}
-
-	return &domain.Order{
-		ID:          orderDTO.ID,
-		Number:      orderDTO.Number,
-		CreatedDate: orderDTO.CreatedDate,
-		Items:       items,
-	}
 }
