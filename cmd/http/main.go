@@ -2,20 +2,27 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/postech-fiap/producao/cmd/config"
+	repository2 "github.com/postech-fiap/producao/cmd/repository"
 	"github.com/postech-fiap/producao/internal/adapter/handler/http"
 	"github.com/postech-fiap/producao/internal/adapter/handler/http/middlewares"
 	"github.com/postech-fiap/producao/internal/adapter/repository"
-	"github.com/postech-fiap/producao/internal/config"
 	"github.com/postech-fiap/producao/internal/core/service"
 )
 
 func main() {
-	// repositories
-	mongoClient, err := config.OpenConnection()
+	// config
+	configuration, err := config.NewConfig()
 	if err != nil {
 		panic(err)
 	}
-	defer config.CloseConnection()
+
+	// repositories
+	mongoClient, err := repository2.OpenConnection(configuration)
+	if err != nil {
+		panic(err)
+	}
+	defer repository2.CloseConnection()
 
 	mongoRepository := repository.NewMongoRepository(mongoClient)
 
