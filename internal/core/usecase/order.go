@@ -30,7 +30,7 @@ func (o *orderUseCase) Insert(order *domain.Order) error {
 		return err
 	}
 	if existentOrder != nil {
-		return exception.NewInvalidDataException("order already exists", nil)
+		return exception.NewConflictException("order already exists", nil)
 	}
 
 	order.Status = domain.PENDING
