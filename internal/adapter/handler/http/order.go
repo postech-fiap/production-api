@@ -2,10 +2,10 @@ package http
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/postech-fiap/producao/internal/adapter/handler/http/dto"
-	"github.com/postech-fiap/producao/internal/core/domain"
-	"github.com/postech-fiap/producao/internal/core/exception"
-	"github.com/postech-fiap/producao/internal/core/port"
+	"github.com/postech-fiap/production-api/internal/adapter/handler/http/dto"
+	"github.com/postech-fiap/production-api/internal/core/domain"
+	"github.com/postech-fiap/production-api/internal/core/exception"
+	"github.com/postech-fiap/production-api/internal/core/port"
 	"net/http"
 )
 

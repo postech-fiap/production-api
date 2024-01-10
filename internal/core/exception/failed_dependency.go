@@ -1,7 +1,7 @@
 package exception
 
 import (
-	"github.com/postech-fiap/producao/internal/core/port"
+	"github.com/postech-fiap/production-api/internal/core/port"
 	"net/http"
 )
 

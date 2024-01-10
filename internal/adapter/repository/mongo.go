@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 	"errors"
-	"github.com/postech-fiap/producao/internal/core/domain"
-	"github.com/postech-fiap/producao/internal/core/port"
+	"github.com/postech-fiap/production-api/internal/core/domain"
+	"github.com/postech-fiap/production-api/internal/core/port"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"

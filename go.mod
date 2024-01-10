@@ -1,4 +1,4 @@
-module github.com/postech-fiap/producao
+module github.com/postech-fiap/production-api
 
 go 1.21.0
 

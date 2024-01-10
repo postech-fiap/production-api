@@ -1,6 +1,6 @@
 package port
 
-import "github.com/postech-fiap/producao/internal/core/domain"
+import "github.com/postech-fiap/production-api/internal/core/domain"
 
 type OrderRepositoryInterface interface {
 	List() ([]domain.Order, error)

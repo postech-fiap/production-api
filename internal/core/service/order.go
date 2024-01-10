@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/postech-fiap/producao/internal/core/domain"
-	"github.com/postech-fiap/producao/internal/core/exception"
-	"github.com/postech-fiap/producao/internal/core/port"
+	"github.com/postech-fiap/production-api/internal/core/domain"
+	"github.com/postech-fiap/production-api/internal/core/exception"
+	"github.com/postech-fiap/production-api/internal/core/port"
 )
 
 type orderService struct {
