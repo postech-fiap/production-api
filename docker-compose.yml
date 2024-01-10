@@ -23,7 +23,7 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: 123
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@production-mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://root:123@production-mongo:27017/
 
   api:
     container_name: production-api
