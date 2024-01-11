@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/postech-fiap/production-api/cmd/config"
 	repositoryAdapter "github.com/postech-fiap/production-api/cmd/repository"
@@ -11,6 +12,7 @@ import (
 )
 
 func main() {
+	fmt.Println("test")
 	// config
 	configuration, err := config.NewConfig()
 	if err != nil {
