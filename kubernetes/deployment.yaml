@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app: production-api-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: production-api
+  template:
+    metadata:
+      labels:
+        app: production-api
+    spec:
+      containers:
+        - name: api
+          image: gabrielgarciasp/production-api:latest
+          ports:
+            - containerPort: 80
+          env:
+            - name: DATABASE_MONGO_HOST
+              value: "production-mongo"
+            - name: DATABASE_MONGO_PORT
+              value: "27017"
+            - name: DATABASE_MONGO_USERNAME
+              value: "root"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "123"
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 2
