@@ -32,10 +32,12 @@ func main() {
 	orderUseCase := usecase.NewOrderUserCase(mongoRepository)
 
 	// service
+	pingService := http.NewPingService()
 	orderService := http.NewOrderService(orderUseCase)
 
 	router := gin.New()
 	router.Use(middlewares.ErrorService)
+	router.GET("/ping", pingService.Ping)
 	router.GET("/order", orderService.List)
 	router.POST("/order", orderService.Insert)
 	router.PUT("/order/:id/status", orderService.SetStatus)
