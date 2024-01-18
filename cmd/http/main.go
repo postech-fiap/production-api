@@ -38,6 +38,6 @@ func main() {
 	router.GET("/ping", pingService.Ping)
 	router.GET("/order", orderService.List)
 	router.POST("/order", orderService.Insert)
-	router.PUT("/order/:id/status", orderService.SetStatus)
+	router.PUT("/order/:id/status", orderService.UpdateStatus)
 	router.Run()
 }
