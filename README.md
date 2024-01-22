@@ -13,7 +13,7 @@ Mongo Container
 ```bash
 docker run --name=production-mongo --network=production-network -p 27017:27017 -d \
   -e MONGO_INITDB_ROOT_USERNAME=root -e MONGO_INITDB_ROOT_PASSWORD=123 \
-  mongo
+  mongo:6.0.13
 ```
 
 API Image
@@ -32,3 +32,20 @@ docker run --name=production-api --network=production-network -p 8080:8080 -d \
 ```bash
 docker-compose up -d
 ```
+
+### Kubernetes
+
+## Mongo Pods and Services
+```bash
+kubeclt apply -f kubernetes/db/pod.yaml
+kubeclt apply -f kubernetes/db/service.yaml
+kubeclt apply -f kubernetes/db/nodeport.yaml # Optional to local access
+```
+
+## API Pods and Services
+```bash
+kubeclt apply -f kubernetes/api/deployment.yaml
+kubeclt apply -f kubernetes/api/load-balancer-service.yaml
+kubeclt apply -f kubernetes/api/service.yaml # Optional to local access
+```
+

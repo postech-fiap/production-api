@@ -7,7 +7,7 @@ metadata:
 spec:
   containers:
     - name: production-mongo
-      image: mongo
+      image: mongo:6.0.13
       ports:
         - containerPort: 27017
       env:
