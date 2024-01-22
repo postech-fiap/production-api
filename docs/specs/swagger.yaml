@@ -1,0 +1,172 @@
+openapi: 3.0.1
+info:
+  title: production-api
+  description: Service to manage delivery orders
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local
+paths:
+  /ping:
+    get:
+      tags:
+        - Ping
+      description: Health check
+      responses:
+        default:
+          description: Pong response
+          content:
+            text/plain:
+              example: pong
+  /order:
+    get:
+      tags:
+        - Order
+      description: List orders
+      responses:
+        '200':
+          description: List response
+          content:
+            application/json:
+              schema:
+                properties:
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+        '424':
+          description: Failed dependency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Order
+      description: Create order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                id:
+                  type: integer
+                number:
+                  type: string
+                created_date:
+                  type: string
+                  example: "YYYY-MM-DDTHH:MM:SSZ"
+                items:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Item'
+              required:
+                - id
+                - number
+                - created_date
+                - items
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '424':
+          description: Failed dependency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /order/{orderId}/status:
+    put:
+      tags:
+        - Order
+      description: Create order
+      parameters:
+        - in: path
+          name: orderId
+          schema:
+            type: integer
+          required: true
+          description: Order ID to update status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                status:
+                  type: string
+                  enum: [received, in_prepare, done, finished]
+              required:
+                - status
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '424':
+          description: Failed dependency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Order:
+      properties:
+        id:
+          type: integer
+        number:
+          type: string
+        status:
+          type: string
+          enum: [pending, received, in_prepare, done, finished]
+        created_date:
+          type: string
+          example: "YYYY-MM-DDTHH:MM:SSZ"
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+    Item:
+      properties:
+        name:
+          type: string
+        quantity:
+          type: integer
+        comment:
+          type: string
+    Error:
+      properties:
+        message:
+          type: string
