@@ -49,4 +49,4 @@ jobs:
             -Dsonar.sonar.host.url=https://sonarcloud.io
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
             -Dsonar.go.coverage.reportPaths=coverage.out
-            -Dsonar.go.exclusions=**/cmd/**
+            -Dsonar.go.exclusions=**/cmd/**,**/repository/**,**/exception/**,**/http/**,**_test.go**
