@@ -41,7 +41,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.organization=postech-fiap
-            -Dsonar.projectKey=production-api
+            -Dsonar.organization=production-api
+            -Dsonar.projectKey=postech-fiap
             -Dsonar.sonar.host.url=https://sonarcloud.io
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
