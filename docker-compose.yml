@@ -4,7 +4,7 @@ services:
 
   mongo:
     container_name: production-mongo
-    image: mongo
+    image: mongo:6.0.13
     restart: always
     environment:
       MONGO_INITDB_ROOT_USERNAME: root

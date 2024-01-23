@@ -23,7 +23,7 @@ func NewOrderService(orderUseCase port.OrderUseCaseInterface) *orderService {
 func (o *orderService) List(c *gin.Context) {
 	orders, err := o.orderUseCase.List()
 	if err != nil {
-		c.Error(exception.NewInvalidDataException("invalid body", err))
+		c.Error(err)
 		return
 	}
 	ordersResponse := mapper.MapDomainToOrderWrapperDto(orders)
@@ -32,7 +32,8 @@ func (o *orderService) List(c *gin.Context) {
 
 func (o *orderService) Insert(c *gin.Context) {
 	var requestBody dto.OrderInsertRequest
-	err := c.ShouldBind(&requestBody)
+
+	err := c.ShouldBindJSON(&requestBody)
 	if err != nil {
 		c.Error(exception.NewInvalidDataException("invalid body", err))
 		return
@@ -49,7 +50,7 @@ func (o *orderService) Insert(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
-func (o *orderService) SetStatus(c *gin.Context) {
+func (o *orderService) UpdateStatus(c *gin.Context) {
 	var requestURIParams dto.UpdateStatusRequestURI
 	err := c.ShouldBindUri(&requestURIParams)
 	if err != nil {
@@ -58,14 +59,14 @@ func (o *orderService) SetStatus(c *gin.Context) {
 	}
 
 	var requestBody dto.UpdateStatusRequestBody
-	err = c.ShouldBind(&requestBody)
+	err = c.ShouldBindJSON(&requestBody)
 	if err != nil {
 		c.Error(exception.NewInvalidDataException("invalid body", err))
 		return
 	}
 
-	statusToSet := domain.Status(requestBody.Status)
-	err = o.orderUseCase.UpdateStatus(requestURIParams.ID, statusToSet)
+	newStatus := domain.Status(requestBody.Status)
+	err = o.orderUseCase.UpdateStatus(requestURIParams.ID, newStatus)
 	if err != nil {
 		c.Error(err)
 		return

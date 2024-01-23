@@ -22,3 +22,8 @@ jobs:
 
       - name: Test
         run: go test ./...
+
+  sonar-cloud:
+    needs: build
+    uses: ./.github/workflows/sonar_cloud.yml
+    secrets: inherit

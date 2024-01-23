@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: production-api-deployment
   labels:
     app: production-api-deployment
 spec:
@@ -15,18 +15,18 @@ spec:
         app: production-api
     spec:
       containers:
-        - name: api
+        - name: production-api
           image: gabrielgarciasp/production-api:latest
           ports:
             - containerPort: 80
           env:
             - name: DATABASE_MONGO_HOST
-              value: "production-mongo"
+              value: "production-mongo-service"
             - name: DATABASE_MONGO_PORT
               value: "27017"
             - name: DATABASE_MONGO_USERNAME
               value: "root"
-            - name: MYSQL_ROOT_PASSWORD
+            - name: DATABASE_MONGO_PASSWORD
               value: "123"
           readinessProbe:
             httpGet:

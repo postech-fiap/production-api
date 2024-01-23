@@ -22,3 +22,7 @@ jobs:
 
       - name: Push image to Docker Hub
         run: docker push ${{env.DOCKER_USERNAME}}/production-api:latest
+
+  sonar-cloud:
+    uses: ./.github/workflows/sonar_cloud.yml
+    secrets: inherit
