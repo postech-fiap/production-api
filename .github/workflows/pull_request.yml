@@ -35,10 +35,7 @@ jobs:
         with:
           go-version: '1.21.x'
 
-      - name: Run jacoco coverage
-        run: gradle jacocoTestReport
-
-      - name: SonarCloud Scan
+      - name: Sonar Cloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
