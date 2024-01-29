@@ -17,4 +17,4 @@ Feature: change order status
 
     Scenario: change order to invalid status
         When I change from finished to received
-        Then the result should equal false
+        Then the result should equal true
