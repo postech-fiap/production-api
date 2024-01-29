@@ -1,0 +1,61 @@
+name: generate-version
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login Docker Hub
+        run: docker login -u ${{env.DOCKER_USERNAME}} -p ${{env.DOCKER_PASSWORD}}
+
+      - name: Build Docker image
+        run: docker build -t ${{env.DOCKER_USERNAME}}/production-api:latest .
+
+      - name: Push image to Docker Hub
+        run: docker push ${{env.DOCKER_USERNAME}}/production-api:latest
+
+  deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS CLI credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Configure kubeconfig with cluster aws
+        run: |
+          echo "Configuring EKS cluster"
+          aws eks update-kubeconfig --name delivery --region us-east-1
+        if: success()
+
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          chmod +x kubectl
+          sudo mv kubectl /usr/local/bin/
+        if: success()
+
+      - name: Deploy Kubernetes
+        run: |
+          kubectl apply -f ./kubernetes/api/deployment.yaml
+        if: success()
+
+  sonar-cloud:
+    uses: ./.github/workflows/sonar_cloud.yml
+    secrets: inherit

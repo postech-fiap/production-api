@@ -12,6 +12,12 @@ spec:
         - containerPort: 27017
       env:
         - name: MONGO_INITDB_ROOT_USERNAME
-          value: "root"
+          valueFrom:
+            secretKeyRef:
+              name: production-db
+              key: mongo-username
         - name: MONGO_INITDB_ROOT_PASSWORD
-          value: "123"
+          valueFrom:
+            secretKeyRef:
+              name: production-db
+              key: mongo-password
