@@ -35,17 +35,22 @@ docker-compose up -d
 
 ### Kubernetes
 
-## Mongo Pods and Services
+#### Secrets
+```bash
+kubectl create secret generic production-db --from-literal=mongo-username=CHANGE_HERE --from-literal=mongo-password=CHANGE_HERE
+```
+
+#### Mongo Pods and Services
 ```bash
 kubeclt apply -f kubernetes/db/pod.yaml
 kubeclt apply -f kubernetes/db/service.yaml
 kubeclt apply -f kubernetes/db/nodeport.yaml # Optional to local access
 ```
 
-## API Pods and Services
+#### API Pods and Services
 ```bash
 kubeclt apply -f kubernetes/api/deployment.yaml
 kubeclt apply -f kubernetes/api/load-balancer-service.yaml
-kubeclt apply -f kubernetes/api/service.yaml # Optional to local access
+kubeclt apply -f kubernetes/api/service.yaml
 ```
 

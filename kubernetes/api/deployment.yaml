@@ -25,9 +25,15 @@ spec:
             - name: DATABASE_MONGO_PORT
               value: "27017"
             - name: DATABASE_MONGO_USERNAME
-              value: "root"
+              valueFrom:
+                secretKeyRef:
+                  name: production-db
+                  key: mongo-username
             - name: DATABASE_MONGO_PASSWORD
-              value: "123"
+              valueFrom:
+                secretKeyRef:
+                  name: production-db
+                  key: mongo-password
           readinessProbe:
             httpGet:
               path: /ping
