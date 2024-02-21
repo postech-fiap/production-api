@@ -41,3 +41,12 @@ func (o *orderRepositoryMock) UpdateStatus(order *domain.Order) error {
 	args := o.Called(order)
 	return args.Error(0)
 }
+
+type orderQueuePublisherMock struct {
+	mock.Mock
+}
+
+func (o *orderQueuePublisherMock) PublishNewStatus(order *domain.Order) error {
+	args := o.Called(order)
+	return args.Error(0)
+}

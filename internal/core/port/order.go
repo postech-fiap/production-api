@@ -14,3 +14,7 @@ type OrderUseCaseInterface interface {
 	Insert(order *domain.Order) error
 	UpdateStatus(id int64, newStatus domain.Status) error
 }
+
+type OrderQueuePublisherInterface interface {
+	PublishNewStatus(order *domain.Order) error
+}

@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Go
         uses: actions/setup-go@v4
@@ -28,4 +30,4 @@ jobs:
             -Dsonar.sonar.host.url=https://sonarcloud.io
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
             -Dsonar.go.coverage.reportPaths=coverage.out
-            -Dsonar.go.exclusions=**/cmd/**,**/repository/**,**/exception/**,**/http/**,**_test.go**
+            -Dsonar.go.exclusions=**/cmd/**,**/repository/**,**/exception/**,**/http/**,**/queue/**,**_test.go**

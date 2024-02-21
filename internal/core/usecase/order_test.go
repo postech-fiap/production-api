@@ -10,7 +10,7 @@ import (
 
 func Test_NewOrderUserCase(t *testing.T) {
 	t.Run("Create OrderUseCaseInterface", func(t *testing.T) {
-		got := NewOrderUserCase(&orderRepositoryMock{})
+		got := NewOrderUserCase(&orderRepositoryMock{}, &orderQueuePublisherMock{})
 		_, ok := got.(port.OrderUseCaseInterface)
 		if !ok {
 			t.Errorf("NewOrderUserCase() should have created port OrderUseCaseInterface")
@@ -22,7 +22,7 @@ func Test_orderUseCase_List(t *testing.T) {
 	mockOrders := mockOrders()
 
 	type fields struct {
-		orderRepositoryInterface port.OrderRepositoryInterface
+		orderRepository port.OrderRepositoryInterface
 	}
 
 	tests := []struct {
@@ -34,7 +34,7 @@ func Test_orderUseCase_List(t *testing.T) {
 		{
 			name: "Should return orders",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("List").Return(mockOrders, nil)
 					return o
@@ -45,7 +45,7 @@ func Test_orderUseCase_List(t *testing.T) {
 		{
 			name: "Should return error",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("List").Return(nil, mockError())
 					return o
@@ -56,7 +56,7 @@ func Test_orderUseCase_List(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			orderUseCase := NewOrderUserCase(tt.fields.orderRepositoryInterface)
+			orderUseCase := NewOrderUserCase(tt.fields.orderRepository, &orderQueuePublisherMock{})
 
 			gotOrders, gotErr := orderUseCase.List()
 
@@ -78,7 +78,7 @@ func Test_orderUseCase_List(t *testing.T) {
 
 func Test_orderUseCase_Insert(t *testing.T) {
 	type fields struct {
-		orderRepositoryInterface port.OrderRepositoryInterface
+		orderRepository port.OrderRepositoryInterface
 	}
 
 	type args struct {
@@ -94,7 +94,7 @@ func Test_orderUseCase_Insert(t *testing.T) {
 		{
 			name: "Should insert order",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(nil, nil)
 					o.On("Insert", mockOrder(domain.PENDING)).Return(nil)
@@ -108,7 +108,7 @@ func Test_orderUseCase_Insert(t *testing.T) {
 		{
 			name: "Should not insert order because repository return error on check if exists order",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(nil, mockError())
 					return o
@@ -122,7 +122,7 @@ func Test_orderUseCase_Insert(t *testing.T) {
 		{
 			name: "Should not insert order because exists order",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(mockOrder(domain.PENDING), nil)
 					return o
@@ -136,7 +136,7 @@ func Test_orderUseCase_Insert(t *testing.T) {
 		{
 			name: "Should not insert order because repository return error on insert order",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(nil, nil)
 					o.On("Insert", mockOrder(domain.PENDING)).Return(mockError())
@@ -151,7 +151,7 @@ func Test_orderUseCase_Insert(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			orderUseCase := NewOrderUserCase(tt.fields.orderRepositoryInterface)
+			orderUseCase := NewOrderUserCase(tt.fields.orderRepository, &orderQueuePublisherMock{})
 
 			gotErr := orderUseCase.Insert(tt.args.order)
 
@@ -168,7 +168,8 @@ func Test_orderUseCase_Insert(t *testing.T) {
 
 func Test_orderUseCase_UpdateStatus(t *testing.T) {
 	type fields struct {
-		orderRepositoryInterface port.OrderRepositoryInterface
+		orderRepository     port.OrderRepositoryInterface
+		orderQueuePublisher port.OrderQueuePublisherInterface
 	}
 
 	type args struct {
@@ -185,10 +186,15 @@ func Test_orderUseCase_UpdateStatus(t *testing.T) {
 		{
 			name: "Should update status",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(mockOrder(domain.PENDING), nil)
 					o.On("UpdateStatus", mockOrder(domain.RECEIVED)).Return(nil)
+					return o
+				}(),
+				orderQueuePublisher: func() port.OrderQueuePublisherInterface {
+					o := new(orderQueuePublisherMock)
+					o.On("PublishNewStatus", mockOrder(domain.RECEIVED)).Return(nil)
 					return o
 				}(),
 			},
@@ -200,9 +206,14 @@ func Test_orderUseCase_UpdateStatus(t *testing.T) {
 		{
 			name: "Should not update status because repository return error on get order",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(nil, mockError())
+					return o
+				}(),
+				orderQueuePublisher: func() port.OrderQueuePublisherInterface {
+					o := new(orderQueuePublisherMock)
+					o.On("PublishNewStatus", mockOrder(domain.RECEIVED)).Return(nil)
 					return o
 				}(),
 			},
@@ -215,9 +226,14 @@ func Test_orderUseCase_UpdateStatus(t *testing.T) {
 		{
 			name: "Should not update status because order not found",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(nil, nil)
+					return o
+				}(),
+				orderQueuePublisher: func() port.OrderQueuePublisherInterface {
+					o := new(orderQueuePublisherMock)
+					o.On("PublishNewStatus", mockOrder(domain.RECEIVED)).Return(nil)
 					return o
 				}(),
 			},
@@ -230,9 +246,14 @@ func Test_orderUseCase_UpdateStatus(t *testing.T) {
 		{
 			name: "Should not update status because not a valid new status",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(mockOrder(domain.PENDING), nil)
+					return o
+				}(),
+				orderQueuePublisher: func() port.OrderQueuePublisherInterface {
+					o := new(orderQueuePublisherMock)
+					o.On("PublishNewStatus", mockOrder(domain.RECEIVED)).Return(nil)
 					return o
 				}(),
 			},
@@ -245,10 +266,36 @@ func Test_orderUseCase_UpdateStatus(t *testing.T) {
 		{
 			name: "Should not update status because not a valid new status",
 			fields: fields{
-				orderRepositoryInterface: func() port.OrderRepositoryInterface {
+				orderRepository: func() port.OrderRepositoryInterface {
 					o := new(orderRepositoryMock)
 					o.On("Get", mockOrderID).Return(mockOrder(domain.PENDING), nil)
 					o.On("UpdateStatus", mockOrder(domain.RECEIVED)).Return(mockError())
+					return o
+				}(),
+				orderQueuePublisher: func() port.OrderQueuePublisherInterface {
+					o := new(orderQueuePublisherMock)
+					o.On("PublishNewStatus", mockOrder(domain.RECEIVED)).Return(nil)
+					return o
+				}(),
+			},
+			args: args{
+				id:        mockOrderID,
+				newStatus: domain.RECEIVED,
+			},
+			wantErr: mockFailedDependencyException(),
+		},
+		{
+			name: "Should error on publish to queue",
+			fields: fields{
+				orderRepository: func() port.OrderRepositoryInterface {
+					o := new(orderRepositoryMock)
+					o.On("Get", mockOrderID).Return(mockOrder(domain.PENDING), nil)
+					o.On("UpdateStatus", mockOrder(domain.RECEIVED)).Return(nil)
+					return o
+				}(),
+				orderQueuePublisher: func() port.OrderQueuePublisherInterface {
+					o := new(orderQueuePublisherMock)
+					o.On("PublishNewStatus", mockOrder(domain.RECEIVED)).Return(mockError())
 					return o
 				}(),
 			},
@@ -261,7 +308,7 @@ func Test_orderUseCase_UpdateStatus(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			orderUseCase := NewOrderUserCase(tt.fields.orderRepositoryInterface)
+			orderUseCase := NewOrderUserCase(tt.fields.orderRepository, tt.fields.orderQueuePublisher)
 
 			gotErr := orderUseCase.UpdateStatus(tt.args.id, tt.args.newStatus)
 
