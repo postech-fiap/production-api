@@ -1,16 +1,24 @@
 package amqp
 
 import (
+	"fmt"
+	"github.com/postech-fiap/production-api/cmd/config"
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 var connection *amqp.Connection = nil
 var channel *amqp.Channel = nil
 
-func OpenConnection() (*amqp.Channel, error) {
+func OpenConnection(config *config.Config) (*amqp.Channel, error) {
 	var err error = nil
 
-	connection, err = amqp.Dial("amqp://guest:guest@localhost:5672/")
+	url := fmt.Sprintf("amqp://%s:%s@%s:%s/",
+		config.RabbitMQ.Username,
+		config.RabbitMQ.Password,
+		config.RabbitMQ.Host,
+		config.RabbitMQ.Port)
+
+	connection, err = amqp.Dial(url)
 	if err != nil {
 		return nil, err
 	}

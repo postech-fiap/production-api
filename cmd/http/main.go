@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/postech-fiap/production-api/cmd/amqp"
 	"github.com/postech-fiap/production-api/cmd/config"
@@ -20,13 +21,6 @@ func main() {
 		panic(err)
 	}
 
-	// amqp
-	AMQPChannel, err := amqp.OpenConnection()
-	if err != nil {
-		panic(err)
-	}
-	defer amqp.CloneConnection()
-
 	// repository
 	mongoClient, err := repositoryAdapter.OpenConnection(configuration)
 	if err != nil {
@@ -35,6 +29,13 @@ func main() {
 	defer repositoryAdapter.CloseConnection()
 
 	mongoRepository := repository.NewMongoRepository(mongoClient)
+
+	// amqp
+	AMQPChannel, err := amqp.OpenConnection(configuration)
+	if err != nil {
+		panic(err)
+	}
+	defer amqp.CloneConnection()
 
 	// queue publisher
 	orderQueuePublisher := publisher.NewOrderQueuePublisher(AMQPChannel)
@@ -56,5 +57,7 @@ func main() {
 	router.GET("/order", orderService.List)
 	router.POST("/order", orderService.Insert)
 	router.PUT("/order/:id/status", orderService.UpdateStatus)
-	router.Run()
+
+	address := fmt.Sprintf("%s:%s", configuration.Server.Host, configuration.Server.Port)
+	router.Run(address)
 }

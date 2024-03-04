@@ -12,11 +12,18 @@ type Config struct {
 	} `yaml:"server"`
 
 	Database struct {
-		Host     string `yaml:"host"`
-		Port     string `yaml:"port"`
-		Username string `yaml:"username"`
-		Password string `yaml:"password"`
-	} `yaml:"database"`
+		Host     string
+		Port     string
+		Username string
+		Password string
+	}
+
+	RabbitMQ struct {
+		Host     string
+		Port     string
+		Username string
+		Password string
+	}
 }
 
 func NewConfig() (*Config, error) {
@@ -32,10 +39,15 @@ func NewConfig() (*Config, error) {
 		return nil, err
 	}
 
-	config.Database.Host = os.Getenv(config.Database.Host)
-	config.Database.Port = os.Getenv(config.Database.Port)
-	config.Database.Username = os.Getenv(config.Database.Username)
-	config.Database.Password = os.Getenv(config.Database.Password)
+	config.Database.Host = os.Getenv("MONGO_HOST")
+	config.Database.Port = os.Getenv("MONGO_PORT")
+	config.Database.Username = os.Getenv("MONGO_USERNAME")
+	config.Database.Password = os.Getenv("MONGO_PASSWORD")
+
+	config.RabbitMQ.Host = os.Getenv("RABBITMQ_HOST")
+	config.RabbitMQ.Port = os.Getenv("RABBITMQ_PORT")
+	config.RabbitMQ.Username = os.Getenv("RABBITMQ_USERNAME")
+	config.RabbitMQ.Password = os.Getenv("RABBITMQ_PASSWORD")
 
 	return config, nil
 }

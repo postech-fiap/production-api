@@ -25,6 +25,14 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: 123
       ME_CONFIG_MONGODB_URL: mongodb://root:123@production-mongo:27017/
 
+  rabbitmq:
+    container_name: production-rabbitmq
+    image: rabbitmq:3.12-management
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   api:
     container_name: production-api
     build: .
@@ -32,10 +40,15 @@ services:
     restart: always
     depends_on:
       - mongo
+      - rabbitmq
     ports:
       - "8080:8080"
     environment:
-      DATABASE_MONGO_HOST: production-mongo
-      DATABASE_MONGO_PORT: 27017
-      DATABASE_MONGO_USERNAME: root
-      DATABASE_MONGO_PASSWORD: 123
+      MONGO_HOST: production-mongo
+      MONGO_PORT: 27017
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: 123
+      RABBITMQ_HOST: production-rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest

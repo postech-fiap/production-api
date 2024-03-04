@@ -20,20 +20,34 @@ spec:
           ports:
             - containerPort: 80
           env:
-            - name: DATABASE_MONGO_HOST
+            - name: MONGO_HOST
               value: "production-mongo-service"
-            - name: DATABASE_MONGO_PORT
+            - name: MONGO_PORT
               value: "27017"
-            - name: DATABASE_MONGO_USERNAME
+            - name: MONGO_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: production-db
-                  key: mongo-username
-            - name: DATABASE_MONGO_PASSWORD
+                  name: production-mongo
+                  key: username
+            - name: MONGO_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: production-db
-                  key: mongo-password
+                  name: production-mongo
+                  key: password
+            - name: RABBITMQ_HOST
+              value: "production-rabbitmq-service"
+            - name: RABBITMQ_PORT
+              value: "5672"
+            - name: RABBITMQ_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: production-rabbitmq
+                  key: username
+            - name: RABBITMQ_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: production-rabbitmq
+                  key: password
           readinessProbe:
             httpGet:
               path: /ping

@@ -8,7 +8,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 )
 
-const orderNewStatusQueueName = "pedido-notificacao-status"
+const orderNewStatusQueueName = "status-pedido-alterado"
 
 type orderQueuePublisher struct {
 	channel *amqp.Channel

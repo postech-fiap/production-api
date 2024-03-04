@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: production-rabbitmq
+  labels:
+    app: production-rabbitmq
+spec:
+  containers:
+    - name: production-rabbitmq
+      image: rabbitmq:3.12-management
+      ports:
+        - containerPort: 5672
+        - containerPort: 15672
