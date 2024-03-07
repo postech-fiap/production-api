@@ -44,7 +44,7 @@ func (o *orderQueuePublisher) PublishNewStatus(order *domain.Order) error {
 }
 
 func (o *orderQueuePublisher) createQueue() {
-	_, err := o.channel.QueueDeclare(orderNewStatusQueueName, true, false, false, false, nil)
+	_, err := o.channel.QueueDeclare(orderNewStatusQueueName, false, false, false, false, nil)
 	if err != nil {
 		panic(err)
 	}

@@ -68,7 +68,7 @@ func (o *orderQueueConsumer) Listen() {
 }
 
 func (o *orderQueueConsumer) createQueue() {
-	_, err := o.channel.QueueDeclare(orderReceivedQueueName, true, false, false, false, nil)
+	_, err := o.channel.QueueDeclare(orderReceivedQueueName, false, false, false, false, nil)
 	if err != nil {
 		panic(err)
 	}

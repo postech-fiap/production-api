@@ -3,9 +3,9 @@ package domain
 type Status string
 
 const (
-	PENDING    Status = "pending"
-	RECEIVED   Status = "received"
-	IN_PREPARE Status = "in_prepare"
-	DONE       Status = "done"
-	FINISHED   Status = "finished"
+	PENDING    Status = "PENDENTE"
+	RECEIVED   Status = "RECEBIDO"
+	IN_PREPARE Status = "EM_PREPARO"
+	DONE       Status = "FINALIZADO"
+	FINISHED   Status = "ENTREGUE"
 )
