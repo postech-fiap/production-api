@@ -38,7 +38,7 @@ func (o *orderQueuePublisher) PublishNewStatus(order *domain.Order) error {
 		false,
 		false,
 		amqp.Publishing{
-			ContentType: "text/plain",
+			ContentType: "application/json",
 			Body:        body,
 		})
 }
