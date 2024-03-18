@@ -7,12 +7,14 @@ import (
 )
 
 type orderUseCase struct {
-	orderRepository port.OrderRepositoryInterface
+	orderRepository     port.OrderRepositoryInterface
+	orderQueuePublisher port.OrderQueuePublisherInterface
 }
 
-func NewOrderUserCase(orderRepository port.OrderRepositoryInterface) port.OrderUseCaseInterface {
+func NewOrderUserCase(orderRepository port.OrderRepositoryInterface, orderQueuePublisher port.OrderQueuePublisherInterface) port.OrderUseCaseInterface {
 	return &orderUseCase{
-		orderRepository: orderRepository,
+		orderRepository:     orderRepository,
+		orderQueuePublisher: orderQueuePublisher,
 	}
 }
 
@@ -61,6 +63,12 @@ func (o *orderUseCase) UpdateStatus(id int64, newStatus domain.Status) error {
 	if err != nil {
 		return exception.NewFailedDependencyException(err)
 	}
+
+	err = o.orderQueuePublisher.PublishNewStatus(order)
+	if err != nil {
+		return exception.NewFailedDependencyException(err)
+	}
+
 	return nil
 }
 

@@ -30,26 +30,6 @@ func (o *orderService) List(c *gin.Context) {
 	c.JSON(http.StatusOK, ordersResponse)
 }
 
-func (o *orderService) Insert(c *gin.Context) {
-	var requestBody dto.OrderInsertRequest
-
-	err := c.ShouldBindJSON(&requestBody)
-	if err != nil {
-		c.Error(exception.NewInvalidDataException("invalid body", err))
-		return
-	}
-
-	newOrder := mapper.MapInsertDTOToDomain(&requestBody)
-
-	err = o.orderUseCase.Insert(newOrder)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	c.Status(http.StatusCreated)
-}
-
 func (o *orderService) UpdateStatus(c *gin.Context) {
 	var requestURIParams dto.UpdateStatusRequestURI
 	err := c.ShouldBindUri(&requestURIParams)
