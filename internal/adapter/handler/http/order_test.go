@@ -6,7 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/postech-fiap/production-api/internal/adapter/handler/http/middlewares"
 	"github.com/postech-fiap/production-api/internal/core/port"
-	"github.com/stretchr/testify/mock"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -78,84 +77,6 @@ func Test_orderService_List(t *testing.T) {
 			body := response.Body.String()
 			if len(tt.wantBody) > 0 && tt.wantBody != body {
 				t.Errorf("List() body = %v, want %v", body, tt.wantBody)
-			}
-		})
-	}
-}
-
-func Test_orderService_Insert(t *testing.T) {
-	type fields struct {
-		orderUseCase port.OrderUseCaseInterface
-	}
-
-	type args struct {
-		body string
-	}
-
-	tests := []struct {
-		name     string
-		fields   fields
-		args     args
-		wantCode int
-	}{
-		{
-			name: "Should 201",
-			fields: fields{
-				orderUseCase: func() port.OrderUseCaseInterface {
-					b := new(orderUseCaseMock)
-					b.On("Insert", mock.Anything).Return(nil)
-					return b
-				}(),
-			},
-			args: args{
-				body: mockInsertOrderRequest,
-			},
-			wantCode: http.StatusCreated,
-		},
-		{
-			name: "Should 400",
-			fields: fields{
-				orderUseCase: func() port.OrderUseCaseInterface {
-					return new(orderUseCaseMock)
-				}(),
-			},
-			args: args{
-				body: "{}",
-			},
-			wantCode: http.StatusBadRequest,
-		},
-		{
-			name: "Should 424",
-			fields: fields{
-				orderUseCase: func() port.OrderUseCaseInterface {
-					b := new(orderUseCaseMock)
-					b.On("Insert", mock.Anything).Return(mockFailedDependencyException())
-					return b
-				}(),
-			},
-			args: args{
-				body: mockInsertOrderRequest,
-			},
-			wantCode: http.StatusFailedDependency,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			orderService := &orderService{
-				orderUseCase: tt.fields.orderUseCase,
-			}
-
-			router := gin.New()
-			router.Use(middlewares.ErrorService)
-			router.POST("/order", orderService.Insert)
-
-			response := httptest.NewRecorder()
-			request := httptest.NewRequest("POST", "/order", bytes.NewBufferString(tt.args.body))
-			router.ServeHTTP(response, request)
-
-			code := response.Code
-			if tt.wantCode != 0 && tt.wantCode != code {
-				t.Errorf("Insert() code = %v, want %v", code, tt.wantCode)
 			}
 		})
 	}

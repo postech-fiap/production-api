@@ -55,7 +55,6 @@ func main() {
 	router.Use(middlewares.ErrorService)
 	router.GET("/ping", pingService.Ping)
 	router.GET("/order", orderService.List)
-	router.POST("/order", orderService.Insert)
 	router.PUT("/order/:id/status", orderService.UpdateStatus)
 
 	address := fmt.Sprintf("%s:%s", configuration.Server.Host, configuration.Server.Port)

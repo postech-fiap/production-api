@@ -12,22 +12,7 @@ import (
 
 const mockOrderId int64 = 1
 
-const mockInsertOrderRequest = `
-{
-    "id": 1,
-    "number": "0001",
-    "created_date": "2024-01-17T00:00:00Z",
-    "items": [
-        {
-            "name": "Hamburger",
-            "quantity": 1,
-            "comment": "No lettuce"
-        }
-    ]
-}
-`
-
-const mockUpdateOrderStatusRequest = `{"status": "done"}`
+const mockUpdateOrderStatusRequest = `{"status": "FINALIZADO"}`
 
 const mockStatus = domain.DONE
 
@@ -54,7 +39,7 @@ func mockOrderListResponse() string {
 		Orders: []dto.OrderResponse{
 			{
 				ID:          1,
-				Status:      "done",
+				Status:      "FINALIZADO",
 				Number:      "0001",
 				CreatedDate: time.Date(2024, 01, 12, 0, 0, 0, 0, time.UTC),
 				Items: []dto.OrderItemResponse{

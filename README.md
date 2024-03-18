@@ -88,6 +88,8 @@ kubectl apply -f kubernetes/db/nodeport.yaml # Optional to local access
 kubectl apply -f kubernetes/rabbitmq/pod.yaml
 kubectl apply -f kubernetes/rabbitmq/service.yaml
 kubectl apply -f kubernetes/rabbitmq/nodeport.yaml # Optional to local access
+kubectl apply -f kubernetes/rabbitmq/load-balancer-service.yaml # Optional to local access
+kubectl apply -f kubernetes/rabbitmq/load-balancer-service-2.yaml # Optional to local access
 ```
 
 #### API Pods and Services
