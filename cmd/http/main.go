@@ -15,6 +15,7 @@ import (
 )
 
 func main() {
+	fmt.Println("test")
 	// config
 	configuration, err := config.NewConfig()
 	if err != nil {
